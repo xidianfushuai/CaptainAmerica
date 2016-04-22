@@ -1,5 +1,6 @@
 package com.fushuai.captainamerica.activity;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -11,18 +12,26 @@ import org.json.JSONObject;
 
 import com.fushuai.captainamerica.R;
 import com.fushuai.captainamerica.utils.StreamUtils;
+import com.fushuai.captainamerica.utils.ToastUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +43,7 @@ public class SplashActivity extends Activity {
 	protected static final int CODE_ENTER_HOME = 4;//进入主页面
 	
 	private TextView tvVersion;
+	private TextView tvProgress;//下载进度展示
 	private String mVersionName;//版本名    成员变量一般在前面加上m   member   布局里面的控件不加
 	private int mVersionCode;//版本号
 	private String mDesc;
@@ -74,7 +84,7 @@ public class SplashActivity extends Activity {
 		
 		tvVersion = (TextView) findViewById(R.id.tv_version);
 		tvVersion.setText("版本名：" + getVersionName());
-		
+		tvProgress = (TextView) findViewById(R.id.tv_progress);//默认隐藏
 		chechVersion();
 	}
 	//获取本地app的版本名称
@@ -188,11 +198,12 @@ public class SplashActivity extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("最新版本：" + mVersionName);
 		builder.setMessage(mDesc);
+		//builder.setCancelable(false);//点击返回无效 		
 		builder.setPositiveButton("立即更新", new OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				
+				download();
 			}
 		});
 		builder.setNegativeButton("以后再说", new OnClickListener() {
@@ -202,8 +213,59 @@ public class SplashActivity extends Activity {
 				enterHome();
 			}
 		});
+		//设置取消监听  用户点击返回时调用
+		builder.setOnCancelListener(new OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				enterHome();
+			}
+		});
 		builder.show();
 		
+	}
+	/**
+	 * 下载新版apk文件*/
+	protected void download() {
+		//XUtils
+		//判断是否存在SD卡
+		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			tvProgress.setVisibility(View.VISIBLE);//显示进度
+			String target = Environment.getExternalStorageDirectory() + "/update.apk";//下载的文件要存放的目录
+			HttpUtils utils = new HttpUtils();
+			utils.download(mDownloadUrl, target, new RequestCallBack<File>() {
+				//文件下载进度
+				@Override
+				public void onLoading(long total, long current, boolean isUploading) {
+					super.onLoading(total, current, isUploading);
+					tvProgress.setText("下载进度" + current * 100 / total + "%");
+				}
+				//下载成功
+				@Override
+				public void onSuccess(ResponseInfo<File> arg0) {
+					//跳转到下载页面
+					Intent intent = new Intent(Intent.ACTION_VIEW);
+					intent.addCategory(Intent.CATEGORY_DEFAULT);
+					//intent.setDataAndType(Uri.fromFile(arg0.result), "application/vnd.android.package-archive");
+					//startActivity(intent);
+					startActivityForResult(intent, 0);//如果用户取消安装  会返回结果 回调onActivityResult方法
+				}
+				//下载失败
+				@Override
+				public void onFailure(HttpException arg0, String arg1) {
+					ToastUtils.toast("下载失败", SplashActivity.this);
+				}
+			});
+		}else {
+			ToastUtils.toast("SD卡不存在", SplashActivity.this);
+		}
+		
+	}
+	/**
+	 * 用户点击取消安装  回调*/
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		enterHome();
 	}
 	/**
 	 * 进入主界面*/
