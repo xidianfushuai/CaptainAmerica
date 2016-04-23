@@ -141,7 +141,7 @@ public class SplashActivity extends Activity {
 						InputStream inputStream = conn.getInputStream();
 						String result = StreamUtils.readFromStream(inputStream);
 						
-						result = "\"versionName\": \"2.0\", \"versionCode\": 2, \"description\": \"新增NB功能,赶紧体验!!!\", \"downloadUrl\":  \"http://www.baidu.com\"";
+						//result = "\"versionName\": \"2.0\", \"versionCode\": 2, \"description\": \"新增NB功能,赶紧体验!!!\", \"downloadUrl\":  \"http://www.baidu.com\"";
 						//解析Json
 						JSONObject jo = new JSONObject(result);
 						mVersionName = jo.getString("versionName");
@@ -242,7 +242,7 @@ public class SplashActivity extends Activity {
 				//下载成功
 				@Override
 				public void onSuccess(ResponseInfo<File> arg0) {
-					//跳转到下载页面
+					//跳转到安装页面
 					Intent intent = new Intent(Intent.ACTION_VIEW);
 					intent.addCategory(Intent.CATEGORY_DEFAULT);
 					//intent.setDataAndType(Uri.fromFile(arg0.result), "application/vnd.android.package-archive");
@@ -253,10 +253,12 @@ public class SplashActivity extends Activity {
 				@Override
 				public void onFailure(HttpException arg0, String arg1) {
 					ToastUtils.toast("下载失败", SplashActivity.this);
+					enterHome();
 				}
 			});
 		}else {
 			ToastUtils.toast("SD卡不存在", SplashActivity.this);
+			enterHome();
 		}
 		
 	}
