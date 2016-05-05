@@ -15,7 +15,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:textColor="@color/black"
-        android:textSize="@dimen/title_text_size"
-        android:text="应用管理"/>
+        android:textSize="@dimen/title_text_size"/>
 
 </LinearLayout>

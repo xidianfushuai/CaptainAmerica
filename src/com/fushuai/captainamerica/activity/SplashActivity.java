@@ -24,6 +24,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -32,6 +33,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,15 +80,31 @@ public class SplashActivity extends Activity {
 			}
 		};
 	};
+	private SharedPreferences mPref;
+	private RelativeLayout rlRoot;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash);
 		
+		rlRoot = (RelativeLayout) findViewById(R.id.rl_root);
+		//簡便的動畫效果
+		AlphaAnimation anim = new AlphaAnimation(0.6f, 1f);
+		anim.setDuration(2000);
+		rlRoot.startAnimation(anim);
+		
 		tvVersion = (TextView) findViewById(R.id.tv_version);
 		tvVersion.setText("版本名：" + getVersionName());
 		tvProgress = (TextView) findViewById(R.id.tv_progress);//默认隐藏
-		chechVersion();
+		mPref = getSharedPreferences("config", MODE_PRIVATE);
+		boolean autoUpdate = mPref.getBoolean("auto_update", true);
+		if(autoUpdate) {
+			chechVersion();
+		}else {
+			//延時兩秒鐘發送消息
+			mHandler.sendEmptyMessageDelayed(CODE_ENTER_HOME, 2000);
+		}
+		
 	}
 	//获取本地app的版本名称
 	private String getVersionName() {

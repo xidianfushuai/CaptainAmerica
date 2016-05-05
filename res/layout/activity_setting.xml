@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fushuai="http://schemas.android.com/apk/res/com.fushuai.captainamerica"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <TextView 
+        style="@style/TitleStyle"
+        android:text="@string/settings"/>
+	<com.fushuai.captainamerica.view.SettingItemView
+	    android:id="@+id/siv_update"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    fushuai:title="自動更新設置"
+	    fushuai:desc_on="自動更新已開啟"
+	    fushuai:desc_off="自動更新已關閉"/>
+</LinearLayout>

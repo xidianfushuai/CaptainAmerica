@@ -4,5 +4,9 @@
     <string name="app_name">CaptainAmerica</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="settings">設置中心</string>
+    <string name="marquee">能力越大 责任越大 能力越大 责任越大 能力越大 责任越大 能力越大 责任越大 能力越大 责任越大 能力越大 责任越大能力越大 责任越大 能力越大 责任越大</string>
+    <string name="function_list">功能列表</string>
+    <string name="auto_update">自動更新設置</string>
 
 </resources>
