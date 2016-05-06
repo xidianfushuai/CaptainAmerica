@@ -1,6 +1,7 @@
 package com.fushuai.captainamerica.activity;
 
 import com.fushuai.captainamerica.R;
+import com.fushuai.captainamerica.utils.ToastUtils;
 import com.fushuai.captainamerica.view.SettingItemView;
 
 import android.content.Intent;
@@ -42,11 +43,17 @@ public class Setup2Activity extends BaseSetUpActivity {
 		});
 	}
 	public void showPreviousPage() {
+		
 		startActivity(new Intent(this, Setup1Activity.class));
 		finish();
 		overridePendingTransition(R.anim.anim_previous_in, R.anim.anim_previous_out);
 	}
 	public void showNextPage() {
+		String sim = mPref.getString("sim", null);
+		if(TextUtils.isEmpty(sim)) {
+			ToastUtils.toast("请先绑定SIM卡", this);
+			return;
+		}
 		startActivity(new Intent(this, Setup3Activity.class));
 		finish();
 		overridePendingTransition(R.anim.anim_in, R.anim.tran_out);
